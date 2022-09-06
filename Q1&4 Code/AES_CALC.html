@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src='aes.js'></script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/ricmoo/aes-js/e27b99df/index.js"></script>
+</head>
+
+<body>
+<header>
+    <h1>AES Calculator</h1>
+</header>
+
+<main>
+    <h2> AES ECB Encryption</h2>
+    <label>Text (Must be hex): </label>
+    <br/>
+    <input id="text" size="80"> <br>
+    <br/>
+    <label>Key: </label>
+    <br/>
+    <input id="key" size="80" value="73333833393932304073747564656e742e726d69742e6564752e617500000000"> <br> <br>
+    <br>
+    <button type="button" onclick="encryptionButton()">Encrypt</button>
+    <br> <br>
+    <label> Encrypted Result</label> <br>
+    <div id="encryptedValue"></div>
+    <br> <br>
+
+    <h2>AES Decryption</h2>
+    <label>Cipher: </label>
+    <br/>
+    <input type="text" id="cipherText" size="80"> <br>
+    <br/>
+    <label>Key (must be the same from encryption): </label>
+    <br/>
+    <input type="text" id="sameKey" size="80" value="73333833393932304073747564656e742e726d69742e6564752e617500000000">
+    <br> <br>
+    <button type="button" onclick="decryptButton()">Decrypt</button>
+    <br> <br>
+    <label>Decrypted Result</label> <br>
+    <div id="decryptedValue"></div>
+    <br> <br>
+</main>
+
+</html>
