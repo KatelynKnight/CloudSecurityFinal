@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>Shamir Secret Sharing</h2>
+
+
+Secret (s):
+<input id="s" name="s"
+       value="11680660936680894780306616994259701577232715692937504816626657855263106833783725116172914399426962785297313646011576893964351602075852215734443003885110127"><br/>
+
+a(1):
+<input id="a1" name="a1" value="3839920"><br/>
+
+a(2):
+<input id="a2" name="a2" value="88839158373418789650328366800251185725237984320684805554802379922386081063013"><br/>
+
+p:
+<input id="p" name="p" size="90"
+       value="178465110797718974832747287732309317516340939138098598655958108574878107603701878206683813956733644108368896209738655952771933349220845030258355461934746424320499520723320651226423228763643751728631382172773534462115522691555185697082603578250794976100360940419660779050557126546415012835483484908061780574887"><br/>
+<br/>
+
+Polynomial equation:<br/>
+<button type="button" onclick="get_polynomial_equation()">get polynomial equation</button>
+<br/>
+f(x) = s + a(1)*x + a(2)*x^2 (mod p) =
+<div id="polynomial_equation" name="polynomial_equation"></div>
+<br/>
+
+<button type="button" onclick="compute_4_points()">compute 4 points</button>
+<br/>
+when x = 1, 2, 3, 4
+<div id="point1" name="point1"></div>
+<div id="point2" name="point2"></div>
+<div id="point3" name="point3"></div>
+<div id="point4" name="point4"></div>
+<br/><br/>
+Select any three points above can recover the secret (s): <br/>
+select x0: <input id="select_x0" name="select_x0"/><br/>
+select y0: <input id="select_y0" name="select_y0"/><br/>
+<br/>
+select x1: <input id="select_x1" name="select_x1"/><br/>
+select y1: <input id="select_y1" name="select_y1"/><br/>
+<br/>
+select x2: <input id="select_x2" name="select_x2"/><br/>
+select y2: <input id="select_y2" name="select_y2"/><br/>
+<br/>
+
+<button type="button" onclick="recover_secret()">recover secret s</button>
+<br/>
+<div id="recovered_secret" name="recovered_secret"></div>
+
+
+<script type="text/javascript" src="biginteger.js"></script>
+
+
+<script type="text/javascript">
+
+
+    function get_polynomial_equation() {
+        var s = document.getElementById("s").value;
+        var a1 = document.getElementById("a1").value;
+        var a2 = document.getElementById("a2").value;
+        var p = document.getElementById("p").value;
+        document.getElementById('polynomial_equation').innerHTML = s + " + " + a1 + "*x + " + a2 + "*x^2 mod " + p;
+    }
+
+
+    function compute_4_points() {
+        // get s, b, p and convert them to big integer
+        var s = document.getElementById("s").value;
+        s = bigInt(s);
+        var a1 = document.getElementById("a1").value;
+        a1 = bigInt(a1);
+        var a2 = document.getElementById("a2").value;
+        a2 = bigInt(a2);
+        var p = document.getElementById("p").value;
+        p = bigInt(p);
+
+        //  f(x) = s + b * x mod p
+
+        // when x = 1,
+        var x1 = bigInt("1");
+        var y1 = add_mod(s, multiply_mod(a1, x1, p), multiply_mod(a2, x1, p), p);
+        var x2 = bigInt("2");
+        var y2 = add_mod(s, multiply_mod(a1, x2, p), multiply_mod(a2, x2, p), p);
+        var x3 = bigInt("3");
+        var y3 = add_mod(s, multiply_mod(a1, x3, p), multiply_mod(a2, x3, p), p);
+        var x4 = bigInt("4");
+        var y4 = add_mod(s, multiply_mod(a1, x4, p), multiply_mod(a2, x4, p), p);
+
+        document.getElementById('point1').innerHTML = "(" + x1.toString() + ", " + y1.toString() + ")";
+        document.getElementById('point2').innerHTML = "(" + x2.toString() + ", " + y2.toString() + ")";
+        document.getElementById('point3').innerHTML = "(" + x3.toString() + ", " + y3.toString() + ")";
+        document.getElementById('point4').innerHTML = "(" + x4.toString() + ", " + y4.toString() + ")";
+
+    }
+
+
+    function recover_secret() {
+
+        // get mod p
+        var p = document.getElementById("p").value;
+        p = bigInt(p);
+
+        // get selected two points
+        var x0 = document.getElementById("select_x0").value;
+        x0 = bigInt(x0);
+        var y0 = document.getElementById("select_y0").value;
+        y0 = bigInt(y0);
+
+        var x1 = document.getElementById("select_x1").value;
+        x1 = bigInt(x1);
+        var y1 = document.getElementById("select_y1").value;
+        y1 = bigInt(y1);
+
+        var x2 = document.getElementById("select_x2").value;
+        x2 = bigInt(x2);
+        var y2 = document.getElementById("select_y2").value;
+        y2 = bigInt(y2);
+
+        //
+        //  based on Lecture week10 page 24
+        //
+        // compute the secret below:
+        var first_part = multiply_mod(y0, multiply_mod(multiply_mod(x1, inverse_mod(sub_mod(x1, x0, p), p), p), multiply_mod(x2, inverse_mod(sub_mod(x2, x0, p), p), p), p), p);
+
+        //var first_part = multiply_mod(y0, multiply_mod(x1, inverse_mod(sub_mod(x1, x0, p), p), p), p);
+        var second_part = multiply_mod(y1, multiply_mod(multiply_mod(x0, inverse_mod(sub_mod(x0, x1, p), p), p), multiply_mod(x2, inverse_mod(sub_mod(x2, x1, p), p), p), p), p);
+
+        // var second_part = multiply_mod(y1, multiply_mod(x0, inverse_mod(sub_mod(x0, x1, p), p), p), p);
+        var third_part = multiply_mod(y2, multiply_mod(multiply_mod(x0, inverse_mod(sub_mod(x0, x2, p), p), p), multiply_mod(x1, inverse_mod(sub_mod(x1, x2, p), p), p), p), p);
+
+        //var third_part = multiply_mod(y2, multiply_mod(x0, inverse_mod(sub_mod(x0, x1, p), p), p), p);
+        var recovered_secret = add_mod(first_part, second_part, third_part, p);
+
+        document.getElementById('recovered_secret').innerHTML = recovered_secret.toString(16);
+
+    }
+
+    // necessary computation functions for Big Integer
+    // compute a mod b
+    function mod(a, b) {
+        var result = a.mod(b);
+        if (result.isNegative())
+            result = result.add(b);
+        return result;
+    }
+
+    // compute a^b mod c
+    function power_mod(a, b, c) {
+        var result = a.modPow(b, c);
+        return result;
+    }
+
+    // compute (a+b+d) mod c
+    function add_mod(a, b, c, d) {
+        var result = a.add(b);
+        var result2 = result.add(c);
+        result = mod(result2, d);
+        return result;
+    }
+
+    // compute (a-b) mod c
+    function sub_mod(a, b, c) {
+        var result = a.subtract(b);
+        result = mod(result, c);
+        return result;
+    }
+
+    // compute (a*b) mod c
+    function multiply_mod(a, b, c) {
+        var result = a.multiply(b);
+        result = mod(result, c);
+        return result;
+    }
+
+    // compute a^(-1) mod b
+    function inverse_mod(a, b) {
+        var result = a.mod(b);
+        result = result.modInv(b);
+        return result;
+    }
+</script>
+</body>
+</html>

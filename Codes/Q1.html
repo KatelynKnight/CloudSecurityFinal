@@ -1,0 +1,178 @@
+<head>
+</head>
+<body>
+
+<h2>Paillemer encryption</h2>
+
+
+Keys <br><br>
+
+q: <input id="q" name="q" value="11680660936680894780306616994259701577232715692937504816626657855263106833783725116172914399426962785297313646011576893964351602075852215734443003885110127"><br><br>
+
+p: <input id="p" name="p" value="8189255686368559776198327358876578573950878555400244699215395648478414431357446946658570263220593956030150642308346249329580530936866538519820414093297833"><br><br>
+
+n: <input id="n" name="n" value="95655918996257125327865339440879610730272007911606576712883557344074208997168262433010783426301219805736275544707003155627757478588475739105714244882077636628195225350004144110291613849612326894975815995517936609242726003398928330820160689061932575345884944599579994744564082841774126463916377223933815454791"><br><br>
+
+n2: <input id="n2" name="n2" value="9150054839018504767084279815739877808308976334179069295517612733820088476723389532078700925221131447479913775762412248013746828954803841673025206952831135512448297227517566307211064790228441384899315865296763933192681986161375433043710010829656958095285440707835044950531791236088922668504702032375826698581156120412337039872703485496170056791581553466735046285744213758874345040220407693377467339399444189000117255611655971664254408058421302888032223855626368414923631476635802485424467508388700789241022615806054925218211220033133043349424624137181367578673636066851732960539462907230832624849728554392522164853681"><br><br>
+
+g: <input id="g" name="g" value="95655918996257125327865339440879610730272007911606576712883557344074208997168262433010783426301219805736275544707003155627757478588475739105714244882077636628195225350004144110291613849612326894975815995517936609242726003398928330820160689061932575345884944599579994744564082841774126463916377223933815454792"><br><br>
+
+<h4>Encryption</h4>
+
+
+plaintext 1 in decimal: <input id="plaintext1" name="plaintext1" value="49255"><br><br>
+random value 1: <input id="random1" name="random1" value="11742103004339407549139194192984930641162621762855691775274148520970708605872455161824068455063213168764317198430775398465010497776569671811794494048636143"><br><br>
+
+plaintext 2 in decimal: <input id="plaintext2" name="plaintext2" value="64752"><br><br>
+random value 2: <input id="random2" name="random2" value="13193485070741478137921681703891462087703023729192532842786081625779678988121012244998774063942349367657114858396081534210283411839545202335629087683123943"><br><br>
+
+plaintext 3 in decimal: <input id="plaintext3" name="plaintext3" value="15790"><br><br>
+random value 3: <input id="random3" name="random3" value="8014360023670449419785186906802112739998089964461462159861145161784169603632342984521019965497087356292516325925922363046368887965966576898591916843595081"><br><br>
+
+
+
+
+<button type="button" onclick="encryption()">Encrypting plaintext:</button>
+<br><br>
+
+
+ciphertext in hex:
+</br>
+C1 = <div id="plaintexthex1" name="plaintexthex1"></div>
+<div id="ciphertext1_part3" name="ciphertext1_part3"></div>
+
+C2 = <div id="plaintexthex2" name="plaintexthex2"></div>
+<div id="ciphertext2_part3" name="ciphertext2_part3"></div>
+
+C3 =<div id="plaintexthex3" name="plaintexthex3"></div>
+<div id="ciphertext3_part3" name="ciphertext3_part3"></div>
+
+</br>
+C= <div id="final_encryption" name="final_encryption"></div>
+<br><br>
+
+<script src="biginteger.js"></script>
+
+<script type="text/javascript">
+
+
+    function encryption() {
+        var g = document.getElementById("g").value;
+        g = bigInt(g);
+
+        var p = document.getElementById("p").value;
+        p = bigInt(p);
+
+        var n2 = document.getElementById("n2").value;
+        n2 = bigInt(n2);
+
+        var n = document.getElementById("n").value;
+        n = bigInt(n);
+
+        var plaintext1 = document.getElementById("plaintext1").value;
+        plaintext1 = bigInt(plaintext1);
+        hexPlaintext = plaintext1.toString(16)
+
+        var random1 = document.getElementById("random1").value;
+        random1 = bigInt(random1);
+
+        var plaintext2 = document.getElementById("plaintext2").value;
+        plaintext2 = bigInt(plaintext2);
+        hexPlaintext2 = plaintext2.toString(16)
+
+        var random2 = document.getElementById("random2").value;
+        random2 = bigInt(random2);
+
+        var plaintext3 = document.getElementById("plaintext3").value;
+        plaintext3 = bigInt(plaintext3);
+        hexPlaintext3 = plaintext3.toString(16)
+
+        var random3 = document.getElementById("random3").value;
+        random3 = bigInt(random3);
+
+
+        //Start encrypting plaintext
+        C1part1 = power_mod(g, plaintext1, n2);
+        C1part2 = power_mod(random1, n, n2);
+        C1 = multiply_mod(C1part1, C1part2, n2)
+        hexString1 = C1.toString(16);
+
+        c2part1 = power_mod(g, plaintext2, n2);
+        c2Part2 = power_mod(random2, n, n2);
+        C2 = multiply_mod(c2part1, c2Part2, n2)
+        hexString2 = C2.toString(16);
+
+        c3part1 = power_mod(g, plaintext3, n2);
+        c3part2 = power_mod(random3, n, n2);
+        C3 = multiply_mod(c3part1, c3part2, n2)
+        hexString3 = C3.toString(16);
+
+        encryption1 = multiply_mod(C1, C2, n2);
+        encryption2 = multiply_mod(encryption1, C3, n2);
+        encryptionHex = encryption2.toString(16)
+
+
+        document.getElementById('plaintexthex1').innerHTML = hexPlaintext;
+        document.getElementById('ciphertext1_part3').innerHTML = hexString1;
+
+        document.getElementById('plaintexthex2').innerHTML = hexPlaintext2;
+        document.getElementById('ciphertext2_part3').innerHTML = hexString2;
+
+        document.getElementById('plaintexthex3').innerHTML = hexPlaintext3;
+        document.getElementById('ciphertext3_part3').innerHTML = hexString3;
+
+        document.getElementById('final_encryption').innerHTML = encryptionHex;
+
+
+    }
+
+
+
+    // necessary computation functions for Big Integer
+    //
+    // all inputs must be Big Integer
+    //
+    // compute a^b mod c
+    function power_mod(a, b, c) {
+        var result = a.modPow(b, c);
+        return result;
+    }
+
+    // compute a mod b
+    function mod(a, b) {
+        var result = a.mod(b);
+        if (result.isNegative())
+            result = result.add(b);
+        return result;
+    }
+
+
+    // compute (a*b) mod c
+    function multiply_mod(a, b, c) {
+        var result = a.multiply(b);
+        result = mod(result, c);
+        return result;
+    }
+
+    // compute a^(-1) mod b
+    function inverse_mod(a, b) {
+        var result = a.mod(b);
+        result = result.modInv(b);
+        return result;
+    }
+
+
+</script>
+
+
+</body>
+<div id="13fe9754-8687-4338-bf9a-78a5da16b3e4" style="all: initial;"></div>
+<div id="474f0ca4-48e6-4396-8b8f-6595f14da067" style="all: initial;"></div>
+<div id="d334f71f-b522-42aa-85c5-aed95fcf20e5" style="all: initial;"></div>
+<div id="8f071468-f0ee-4230-97fd-994604addfb5" style="all: initial;"></div>
+<div id="fddb33cf-576f-417d-852a-b1479448ceef" style="all: initial;"></div>
+<div id="cbf2623e-d8a1-46cc-862f-1bf0e5a902f4" style="all: initial;"></div>
+<div id="c5f690b1-e4f1-46e4-8503-9af720e98dec" style="all: initial;"></div>
+<div id="5110566b-fd88-4ea0-88e8-1bc0b239ac31" style="all: initial;"></div>
+<div id="5afb63a4-b31a-4650-9c6d-d0cae5588332" style="all: initial;"></div>
+<div id="19cd9c9c-9f7e-4634-9a68-e175f61a0581" style="all: initial;"></div>
